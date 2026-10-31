@@ -18,7 +18,8 @@
     "test:stride": "node tests/stride-browser.mjs",
     "export:glb": "node tools/export-glb.mjs",
     "assets:generate": "node tools/export-glb.mjs --out public/models --runtime-only",
-    "start": "node tools/serve.mjs"
+    "start": "node tools/serve.mjs",
+    "test:scene": "node tests/scene-browser.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",

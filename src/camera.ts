@@ -7,6 +7,7 @@ export class FollowCamera {
   move(dx: number, dy: number) { this.yaw -= dx * .0024; this.pitch = clamp(this.pitch + dy * .002, -.12, .95); }
   zoom(delta: number) { this.distance = clamp(this.distance + delta * .003, 2.5, 8); }
   update(p: Point, dt: number, surfaces: T.Object3D[], home = false) {
+    if(home){this.camera.position.set(42,30,30);this.camera.lookAt(0,9,-18);this.camera.setViewOffset(innerWidth,innerHeight,-innerWidth*.1,0,innerWidth,innerHeight);return;}
     const aim = new T.Vector3(p.x, p.y + .25, p.z);
     if (!this.initialized) { this.target.copy(aim); this.initialized = true; }
     this.target.lerp(aim, 1 - Math.exp(-dt * 7));

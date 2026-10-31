@@ -30,7 +30,7 @@ export class Walker {
     const hit=this.physics.castRayAndGetNormal(new R.Ray({x,y:top,z},{x:0,y:-1,z:0}),depth,true,undefined,GROUP.person,undefined,undefined,c=>!c.isSensor()&&!own.has(c.parent()?.handle??-1));
     return hit&&hit.normal.y>.3?{x,y:top-hit.timeOfImpact,z,normal:hit.normal,collider:hit.collider}:null;
   }
-  reset(p:Point){this.recovery.clear();this.lean.clear();this.rig.reset(p);this.fallen=false;this.downContact=this.unstable=this.fallTime=this.panic=this.motionTime=0;this.balance=1;this.facing=0;this.footfalls=[];
+  reset(p:Point,facing=0){this.recovery.clear();this.lean.clear();this.rig.reset(p,facing);this.fallen=false;this.downContact=this.unstable=this.fallTime=this.panic=this.motionTime=0;this.balance=1;this.facing=facing;this.footfalls=[];
     for(const f of Object.values(this.feet)){f.pos.copy(f.body.translation());f.pos.y-=FOOT_HEIGHT;f.target.copy(f.pos);f.origin.copy(f.pos);f.stance.copy(f.pos);f.previous.copy(f.pos);f.rendered.copy(f.pos);f.velocity.set(0,0,0);f.grounded=false;f.lifted=false;f.load=0;f.planting=null;f.swingTime=0;f.lowerTime=0;f.prepareTime=0;f.ready=false;f.landingAge=1;f.heading=0;}
     this.contacts.frame.points=[];this.contacts.frame.normalLoad=0;
   }

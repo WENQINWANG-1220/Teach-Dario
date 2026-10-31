@@ -15,7 +15,7 @@ window.exportAll=async(runtimeOnly:boolean)=>{
     const loaded=await loader.parseAsync(bytes,'');validateModel(loaded.scene,def);
     const box=new T.Box3().setFromObject(loaded.scene);if(before.min.distanceTo(box.min)>.0001||before.max.distanceTo(box.max)>.0001)throw Error(`${def.file}: bounds changed during export`);
     let meshes=0;loaded.scene.traverse(n=>{if(n instanceof T.Mesh)meshes++;});
-    const purpose:Record<string,string>={hiker:'15 刚体物理姿态驱动的玩家角色（骨架第 2 版）',box:'按路线参数缩放的路面、平台或支撑块',wall:'折线窄墙顶挑战', 'ruin-step':'错层遗迹石阶挑战',log:'跨谷独木桥',stone:'错位踏脚石挑战',tree:'山路树木',hill:'山体与远景',rock:'环境岩石',flower:'起步草甸花朵',flag:'检查点与终点旗帜',sign:'运行时文字路牌',water:'峡谷水面'};
+    const purpose:Record<string,string>={poop:'卷曲便便山与滑道开口',base:'山脚安全地面',toilet:'山顶黄金马桶',hiker:'15 刚体物理姿态驱动的玩家角色（骨架第 2 版）',box:'按路线参数缩放的路面、平台或支撑块',wall:'折线窄墙顶挑战', 'ruin-step':'错层遗迹石阶挑战',log:'跨谷独木桥',stone:'错位踏脚石挑战',tree:'山路树木',hill:'山体与远景',rock:'环境岩石',flower:'起步草甸花朵',flag:'检查点与终点旗帜',sign:'运行时文字路牌',water:'峡谷水面'};
     const origin=['tree','flower','flag','sign'].includes(def.kind)?'局部原点位于根部／立柱底部':def.kind==='hiker'?'局部原点位于地面双脚中间；驱动节点坐标见编辑说明':'局部原点位于主体中心';
     const report={...def,axis:def.axis??'Y up; local XYZ',origin:def.id==='complete-scene'?'世界原点位于起步位置':origin,purpose:def.id==='complete-scene'?'完整静态场景编辑参考':purpose[def.kind],dimensions:box.getSize(new T.Vector3()).toArray(),bytes:bytes.byteLength,meshes,bounds:{min:box.min.toArray(),max:box.max.toArray()}};reports.push(report);
     await window.saveGLB(def.file,base64(bytes),report);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { InputState } from '../src/input';
-import { CHECKPOINTS, RunState, limitTarget, route, supportSafe } from '../src/model';
+import { CHECKPOINTS, MAP_ID, RunState, limitTarget, route, supportSafe } from '../src/model';
 import { parseSave } from '../src/storage';
 describe('input aliases and independent feet', () => {
   it.each([['KeyW', 'ArrowUp'], ['KeyS', 'ArrowDown'], ['KeyA', 'ArrowLeft'], ['KeyD', 'ArrowRight']])('%s matches %s', (a, b) => {
@@ -28,9 +28,9 @@ describe('run lifecycle', () => {
   it('keeps recovery through pause and resume',()=>{const r=new RunState();r.phase='recovering';r.pause();expect(r.phase).toBe('paused');r.resume();expect(r.phase).toBe('recovering');});
   it('advances checkpoints once, preserves maximum progress and resets', () => { const r = new RunState(); r.reset(); for (let i = 1; i < CHECKPOINTS.length; i++) { expect(r.advance(CHECKPOINTS[i])).toBe(true); expect(r.checkpoint).toBe(i); expect(r.advance(CHECKPOINTS[i] - 1)).toBe(false); } r.reset(); expect(r.checkpoint).toBe(0); expect(r.maxProgress).toBe(0); });
 });
-const valid = { version: 1, checkpoint: CHECKPOINTS.indexOf(64), checkpointMeters:64, elapsed: 30, falls: 1, steps: 20, maxProgress: 65, best: null, muted: false, finished: false };
+const valid = { version: 1, map:MAP_ID, checkpoint: CHECKPOINTS.indexOf(48), checkpointMeters:48, elapsed: 30, falls: 1, steps: 20, maxProgress: 65, best: null, muted: false, finished: false };
 describe('save validation', () => {
   it('accepts valid saved progress', () => expect(parseSave(JSON.stringify(valid))).toEqual(valid));
-  it('migrates old checkpoint indices by distance without losing records',()=>{const old={...valid,checkpoint:2,best:300};delete (old as {checkpointMeters?:number}).checkpointMeters;const migrated=parseSave(JSON.stringify(old));expect(migrated?.checkpoint).toBe(CHECKPOINTS.indexOf(64));expect(migrated?.checkpointMeters).toBe(64);expect(migrated?.best).toBe(300);expect(migrated?.elapsed).toBe(30);});
+  it('rejects old-map saves rather than restoring an unrelated checkpoint',()=>{const old={...valid};delete (old as {map?:string}).map;expect(parseSave(JSON.stringify(old))).toBeNull();});
   it.each([null, '', 'oops', '{}', JSON.stringify({ ...valid, version: 5 }), JSON.stringify({ ...valid, checkpoint: -1 }), JSON.stringify({ ...valid, elapsed: -1 }), JSON.stringify({ ...valid, maxProgress: 999 }), JSON.stringify({ ...valid, falls: .5 }), JSON.stringify({ ...valid, best: -2 })])('rejects corrupt or unsupported save %s', raw => expect(parseSave(raw)).toBeNull());
 });

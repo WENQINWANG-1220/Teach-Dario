@@ -13,7 +13,7 @@ try{
   assert.equal(count,expected);assert.equal(requests.some(u=>u.includes('/src/art/builders')),false);
   const sharing=await page.evaluate(()=>{const a=g.assets.instantiate('tree'),b=g.assets.instantiate('tree'),meshes=[];a.traverse(n=>{if(n.isMesh)meshes.push(n);});const other=[];b.traverse(n=>{if(n.isMesh)other.push(n);});return {geometry:meshes[0].geometry===other[0].geometry,material:meshes[0].material===other[0].material,node:a!==b};});assert.deepEqual(sharing,{geometry:true,material:true,node:true});
   const collision=await page.evaluate(async()=>{
-    const {FollowCamera}=await import('/src/camera.ts'),wall=g.world.surfaces.find(n=>n.userData.assetSource?.includes('terrain-wall'));
+    const {FollowCamera}=await import('/src/camera.ts'),wall=g.world.surfaces.find(n=>n.userData.assetSource?.includes('terrain-rest'));
     g.world.scene.updateMatrixWorld(true);wall.geometry.computeBoundingBox();const box=wall.geometry.boundingBox.clone().applyMatrix4(wall.matrixWorld),center=box.getCenter(wall.position.clone()),camera=new FollowCamera();camera.yaw=Math.PI/2;camera.pitch=0;camera.distance=5;
     camera.update({x:box.min.x-1,y:center.y-.25,z:center.z},1/60,g.world.surfaces);
     return {allGLB:g.world.surfaces.every(n=>n.isMesh&&n.userData.assetSource?.endsWith('.glb')),distance:camera.camera.position.distanceTo(camera.target),beforeWall:camera.camera.position.x<box.min.x};

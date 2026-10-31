@@ -15,8 +15,8 @@ export class Landscape {
   private dust:{mesh:T.Mesh;life:number;vx:number;vz:number}[]=[];
   private sun:T.DirectionalLight;
   constructor(readonly physics:RAPIER.World,assets:GLBAssets){
-    const scene=this.scene;scene.background=new T.Color('#dce7d7');scene.fog=new T.Fog('#dce7d7',45,145);
-    scene.add(new T.HemisphereLight('#fff7df','#8b9b68',2.1));
+    const scene=this.scene;scene.background=new T.Color('#b8d2d2');scene.fog=new T.Fog('#b8d2d2',45,145);
+    scene.add(new T.HemisphereLight('#fff1cd','#8b9b68',2.1));
     const sun=new T.DirectionalLight('#fff1cc',3.1);sun.position.set(-18,35,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
     sun.shadow.camera.left=sun.shadow.camera.bottom=-22;sun.shadow.camera.right=sun.shadow.camera.top=22;sun.shadow.normalBias=.035;sun.shadow.bias=-.0002;scene.add(sun,sun.target);this.sun=sun;
     for(const p of ART_LAYOUT.placements){
@@ -29,12 +29,15 @@ export class Landscape {
         object.traverse(n=>{if(n instanceof T.Mesh){this.surfaces.push(n);const attribute=n.geometry.getAttribute('position'),transform=matrix.clone().multiply(n.matrixWorld);for(let i=0;i<attribute.count;i++)vertices.push(...new T.Vector3().fromBufferAttribute(attribute,i).applyMatrix4(transform).toArray());}});
         const desc=RAPIER.ColliderDesc.convexHull(new Float32Array(vertices));if(!desc)throw Error(`无法创建物理凸包：${p.asset}`);physics.createCollider(desc.setDensity(material.density).setFriction(material.friction).setFrictionCombineRule(RAPIER.CoefficientCombineRule.Min).setRestitution(material.restitution).setCollisionGroups(GROUP.prop),body);
         const bounds=new T.Box3().setFromObject(object),half=bounds.getSize(new T.Vector3()).multiplyScalar(.5);this.environment.add(body,body.mass()/material.density,half,object);
-      }else if(['rock','hill','tree','sign','flag'].includes(kind)){
+      }else if(kind==='poop'){
+        object.updateMatrixWorld(true);object.traverse(n=>{if(!(n instanceof T.Mesh))return;const attribute=n.geometry.getAttribute('position'),vertices:number[]=[];for(let i=0;i<attribute.count;i++)vertices.push(...new T.Vector3().fromBufferAttribute(attribute,i).applyMatrix4(n.matrixWorld).toArray());const indices=n.geometry.index?Array.from(n.geometry.index.array as ArrayLike<number>):Array.from({length:attribute.count},(_,i)=>i);physics.createCollider(RAPIER.ColliderDesc.trimesh(new Float32Array(vertices),new Uint32Array(indices)).setFriction(.55).setCollisionGroups(GROUP.terrain));this.surfaces.push(n);});
+      }else if(['rock','hill','tree','sign','flag','toilet'].includes(kind)){
         object.updateMatrixWorld(true);let index=0;object.traverse(n=>{if(!(n instanceof T.Mesh))return;const trunkOnly=kind==='tree'||kind==='flag';if(trunkOnly&&index++>0)return;
-          const attribute=n.geometry.getAttribute('position'),vertices:number[]=[];for(let i=0;i<attribute.count;i++)vertices.push(...new T.Vector3().fromBufferAttribute(attribute,i).applyMatrix4(n.matrixWorld).toArray());const desc=RAPIER.ColliderDesc.convexHull(new Float32Array(vertices));if(desc)physics.createCollider(desc.setFriction(kind==='rock'||kind==='hill'?.75:.65).setRestitution(.02).setCollisionGroups(GROUP.terrain));this.surfaces.push(n);});
+          if(kind==='toilet')n.userData.toilet=true;const attribute=n.geometry.getAttribute('position'),vertices:number[]=[];for(let i=0;i<attribute.count;i++)vertices.push(...new T.Vector3().fromBufferAttribute(attribute,i).applyMatrix4(n.matrixWorld).toArray());const desc=RAPIER.ColliderDesc.convexHull(new Float32Array(vertices));if(desc)physics.createCollider(desc.setFriction(kind==='rock'||kind==='hill'?.75:.65).setRestitution(.02).setCollisionGroups(GROUP.terrain));this.surfaces.push(n);});
       }else if(kind==='water')this.environment.water.push({center:p.position,halfWidth:p.scale.x/2,halfLength:p.scale.z/2,surface:p.position.y,bottom:p.position.y-12});
       if(p.flag)this.flags.push(object.getObjectByName('Flag_Cloth')!);
     }
+    const light=new T.PointLight('#ffd779',10,18);const end=ART_LAYOUT.placements.find(p=>p.asset==='golden-toilet')!;light.position.set(end.position.x,end.position.y+2.5,end.position.z);scene.add(light);
   }
   resetDynamics(){this.environment.reset();}
   puff(p:Point){

@@ -6,16 +6,18 @@ import { FollowCamera } from './camera';
 import { Character } from './character';
 import { InputState, editable } from './input';
 import {GamepadAdapter,PAD,type PadFrame} from './gamepad';
-import { CHECKPOINTS, LENGTH, RunState, clamp, clockLabel, route } from './model';
+import { CHECKPOINTS, LENGTH, RunState, clamp, clockLabel, route, routeFacing, projectRoute } from './model';
 import { SaveStore } from './storage';
 import { UI } from './ui';
 import { Walker } from './walker';
 import { Landscape } from './world';
+import { MountainSlide } from './slide';
 import { CHALLENGES } from './terrain';
 import { GLBAssets } from './art/GLBAssets';
 import {PHYSICS_DT,ROOT_HEIGHT} from './rig';
 export class Game {
   readonly run = new RunState(); readonly input = new InputState(); readonly store = new SaveStore(); readonly audio = new Audio(); readonly view = new FollowCamera();
+  readonly slide=new MountainSlide();
   readonly gamepad=new GamepadAdapter();controlMode:'keyboard'|'gamepad'='keyboard';
   private padAxes={lean:{x:0,z:0},aim:{x:0,y:0},zoom:0};
   readonly ui = new UI(); readonly physics = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
@@ -30,7 +32,7 @@ export class Game {
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7)); this.renderer.setSize(innerWidth, innerHeight); this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = T.PCFSoftShadowMap; this.renderer.toneMapping = T.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.15;
     this.ui.el('scene').append(this.renderer.domElement); this.audio.muted = this.store.muted;
     for(const part of Object.values(this.walker.rig.parts)){const d=part.definition;this.world.environment.add(part.body,d.mass/985,{x:d.shape==='box'?d.size.x/2:d.size.x,y:d.shape==='box'||d.shape==='capsule'?d.size.y/2:d.size.y,z:d.shape==='box'?d.size.z/2:d.size.z});}
-    this.physics.timestep = PHYSICS_DT; this.physics.step(undefined,this.walker.rig.hooks); this.walker.reset(route(0));
+    this.physics.timestep = PHYSICS_DT; this.physics.step(undefined,this.walker.rig.hooks); this.walker.reset(route(0),routeFacing(0));
     if(new URLSearchParams(location.search).has('physicsDebug')){this.debugLines=new T.LineSegments(new T.BufferGeometry(),new T.LineBasicMaterial({vertexColors:true,depthTest:false,transparent:true,opacity:.7}));this.debugLines.frustumCulled=false;this.world.scene.add(this.debugLines);}
     this.ui.show('continue', !!this.store.saved && !this.store.saved.finished); this.updateSound();
     this.ui.button('start', () => this.start(false)); this.ui.button('continue', () => this.start(true));
@@ -41,10 +43,10 @@ export class Game {
     document.addEventListener('keydown', e => {
       if (editable(e.target)) return;
       if (e.code === 'Escape') { this.pause(); return; }
-      if (!['playing', 'fallen', 'recovering'].includes(this.run.phase)) return;
+      if (!['playing', 'fallen', 'recovering','sliding'].includes(this.run.phase)) return;
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
       if (e.repeat) return;
-      if (e.code === 'KeyR') { this.respawn(); return; }
+      if (e.code === 'KeyR'&&this.run.phase!=='sliding') { this.respawn(); return; }
       if (this.run.phase !== 'playing') return;
       this.input.press(e.code);
     });
@@ -63,17 +65,17 @@ export class Game {
     });
     document.addEventListener('contextmenu', e => { if (document.pointerLockElement === this.renderer.domElement) e.preventDefault(); });
     document.addEventListener('mousemove', e => {
-      if (document.pointerLockElement !== this.renderer.domElement || !['playing', 'fallen', 'recovering'].includes(this.run.phase)) return;
+      if (document.pointerLockElement !== this.renderer.domElement || !['playing', 'fallen', 'recovering','sliding'].includes(this.run.phase)) return;
       if (this.run.phase === 'playing' && this.input.footHeld) this.input.moveMouse(e.movementX, e.movementY);
       else this.view.move(e.movementX, e.movementY);
     });
-    this.renderer.domElement.addEventListener('wheel', e => { if (['playing', 'fallen', 'recovering'].includes(this.run.phase)) { e.preventDefault(); this.view.zoom(e.deltaY); } }, { passive: false });
+    this.renderer.domElement.addEventListener('wheel', e => { if (['playing', 'fallen', 'recovering','sliding'].includes(this.run.phase)) { e.preventDefault(); this.view.zoom(e.deltaY); } }, { passive: false });
     document.addEventListener('pointerlockchange', () => {
       if (document.pointerLockElement === this.renderer.domElement) { if (this.lockPending) { this.run.resume(); this.lockPending = false; this.last = performance.now(); this.accumulator = 0; } }
       else if(this.controlMode==='keyboard') { this.pause(false); }
     });
     this.renderer.domElement.addEventListener('click',()=>{
-      if(this.controlMode==='gamepad'&&['playing','fallen','recovering'].includes(this.run.phase)){
+      if(this.controlMode==='gamepad'&&['playing','fallen','recovering','sliding'].includes(this.run.phase)){
         this.pause();this.controlMode='keyboard';this.requestLock();
       }
     });
@@ -117,7 +119,7 @@ export class Game {
       return;
     }
     if(['home','paused','finished'].includes(this.run.phase)){this.gamepadMenu(pad);return;}
-    if(pad.reset){this.respawn();return;}
+    if(pad.reset&&this.run.phase!=='sliding'){this.respawn();return;}
     if(this.run.phase!=='playing')return;
     // Releases first allow a same-frame LT-up / RT-down to change feet cleanly.
     for(const source of pad.released){const foot=this.input.release(source);if(foot)this.walker.land(foot);}
@@ -146,7 +148,7 @@ export class Game {
   start(continuing: boolean) {
     this.run.reset(); this.currentChallenge='';
     if (continuing && this.store.saved && !this.store.saved.finished) { const s = this.store.saved; this.run.checkpoint = s.checkpoint; this.run.elapsed = s.elapsed; this.run.falls = s.falls; this.run.steps = s.steps; this.run.maxProgress = s.maxProgress; }
-    this.clearInput(); this.world.resetDynamics();this.walker.reset(route(CHECKPOINTS[this.run.checkpoint])); this.view.yaw = 0; this.view.pitch = .29; this.view.initialized = false;
+    this.clearInput(); this.world.resetDynamics();this.slide.clear(this.walker);this.walker.reset(route(CHECKPOINTS[this.run.checkpoint]),routeFacing(CHECKPOINTS[this.run.checkpoint])); this.view.yaw = routeFacing(CHECKPOINTS[this.run.checkpoint]); this.view.pitch = .29; this.view.initialized = false;
     this.run.previous = 'playing'; this.run.phase = 'paused'; this.accumulator = 0; this.requestLock(); this.save();
   }
   private lockFailed() { if (!this.lockPending) return; this.lockPending = false; this.run.pause(); this.ui.text('dialog-title', '点击进入游戏'); this.ui.text('dialog-body', '游戏需要锁定鼠标来转动视角。\n点击下方按钮，再迈出第一步。'); this.ui.text('resume', '点击进入游戏 →'); }
@@ -163,16 +165,16 @@ export class Game {
     try { const request = this.renderer.domElement.requestPointerLock(); if (request) void request.catch(() => this.lockFailed()); } catch { this.lockFailed(); }
   }
   pause(exit = true) {
-    if (!['playing', 'fallen', 'recovering'].includes(this.run.phase)) return;
+    if (!['playing', 'fallen', 'recovering','sliding'].includes(this.run.phase)) return;
     this.run.pause(); this.clearInput(); this.accumulator = 0; this.save();
     this.ui.text('dialog-title', '停下来，看看风景'); this.ui.text('dialog-body', this.controlMode==='gamepad'?'山一直都在，准备好再走。\nStart 或 A / × 继续 · B / ○ 返回首页':'山一直都在，准备好再走。\nEsc 暂停 · 移动鼠标转动视角'); this.ui.text('resume', '继续旅程 →');
     if (exit && document.pointerLockElement) document.exitPointerLock();
   }
   home() {
     if (this.run.phase !== 'home' && this.run.phase !== 'finished') this.save();
-    this.run.phase = 'home'; this.lockPending = false; this.clearInput(); if (document.pointerLockElement) document.exitPointerLock(); this.world.resetDynamics();this.walker.reset(route(0)); this.view.initialized = false; this.ui.show('continue', !!this.store.saved && !this.store.saved.finished);
+    this.slide.clear(this.walker);this.run.phase = 'home'; this.lockPending = false; this.clearInput(); if (document.pointerLockElement) document.exitPointerLock(); this.world.resetDynamics();this.walker.reset(route(0),routeFacing(0)); this.view.initialized = false; this.ui.show('continue', !!this.store.saved && !this.store.saved.finished);
   }
-  respawn() { this.clearInput();this.world.resetDynamics(); this.walker.reset(route(CHECKPOINTS[this.run.checkpoint]));this.submergedTime=0; this.run.phase = 'playing'; this.currentChallenge=''; this.autoRespawn = 0; this.view.initialized = false; this.accumulator = 0; this.ui.toast('回到休息站，下一步慢慢来。'); this.save(); }
+  respawn() { this.slide.clear(this.walker);this.clearInput();this.world.resetDynamics(); this.walker.reset(route(CHECKPOINTS[this.run.checkpoint]),routeFacing(CHECKPOINTS[this.run.checkpoint]));this.view.yaw=routeFacing(CHECKPOINTS[this.run.checkpoint]);this.submergedTime=0; this.run.phase = 'playing'; this.currentChallenge=''; this.autoRespawn = 0; this.view.initialized = false; this.accumulator = 0; this.ui.toast('回到休息站，下一步慢慢来。'); this.save(); }
   private save() { this.store.write(this.run, this.audio.muted); this.ui.show('storage-warning', !this.store.available); }
   private finish() {
     this.run.phase = 'finished'; this.clearInput(); this.save(); if (document.pointerLockElement) document.exitPointerLock(); this.audio.sound('finish');
@@ -183,17 +185,21 @@ export class Game {
     const wasFallen = this.walker.fallen;
     this.applyGamepadMotion(dt);
     if (this.run.phase === 'playing') this.applyMouseMotion();
-    this.world.environment.beginStep();this.walker.step(dt, this.run.phase === 'playing' ? this.input.leanAxes() : { x: 0, z: 0 });this.world.environment.step(dt); this.physics.step(undefined,this.walker.rig.hooks);this.walker.postStep(dt);
+    this.world.environment.beginStep();this.walker.step(dt, this.run.phase === 'playing' ? this.input.leanAxes() : { x: 0, z: 0 });const arrived=this.slide.step(this.walker,dt);this.world.environment.step(dt); this.physics.step(undefined,this.walker.rig.hooks);this.walker.postStep(dt);
     for (const event of this.walker.drainFootfalls()) {
       if (event.moved) this.run.steps++;
       this.audio.sound('step', clamp(event.speed * .65, .3, 1));
       if (event.speed > .35) this.world.puff(event.position);
     }
     if (!wasFallen && this.walker.fallen) { this.run.phase = 'fallen'; this.run.falls++; this.clearInput(); this.audio.sound('fall'); this.save(); }
+    if(this.run.phase!=='sliding'){
+      const lane=this.slide.detect(this.walker);
+      if(lane){if(!this.walker.fallen){this.run.falls++;this.audio.sound('fall');}this.clearInput();this.slide.begin(this.walker,lane);this.run.phase='sliding';this.run.checkpoint=0;this.run.maxProgress=0;this.ui.toast('掉入滑道，直达山脚 · 登山检查点已归零');this.save();}
+    }else if(arrived){this.slide.clear(this.walker);this.walker.fall();this.run.phase='fallen';this.ui.toast('已滑到山脚 · 稳定后自动起身，R 回到入口');this.save();}
     if (this.run.phase === 'fallen' && this.walker.recovery.tryBegin(dt)) { this.run.phase = 'recovering'; this.clearInput(); }
     else if (this.run.phase === 'recovering' && !this.walker.recovery.active) { this.run.phase = this.walker.fallen ? 'fallen' : 'playing'; this.clearInput(); }
-    const b = this.walker.body.translation(), s = clamp(-b.z, 0, LENGTH), p = route(s);
-    if (this.run.phase === 'playing' && Math.abs(b.x - p.x) < 3 && Math.abs(b.y - p.y - ROOT_HEIGHT) < 1.3) {
+    const b = this.walker.body.translation(), projected=projectRoute(b),s=projected.s;
+    if (this.run.phase === 'playing' && projected.distance < 2.5 && projected.heightError < .75) {
       const challenge=CHALLENGES.find(c=>s>=c.start&&s<=c.end);
       if(challenge&&challenge.id!==this.currentChallenge)this.ui.toast(`${challenge.name} · ${challenge.hint}`);
       this.currentChallenge=challenge?.id??'';
@@ -201,14 +207,14 @@ export class Game {
       if (s >= LENGTH - .4) { this.run.advance(LENGTH); this.finish(); }
     }
     const head=this.walker.rig.parts.Head.body;this.submergedTime=this.world.environment.submerged(head,{x:.12,y:.12,z:.12})>.85?this.submergedTime+dt:0;
-    if (b.y < -20 || Math.abs(b.x - p.x) > 30 ||this.submergedTime>3) { this.autoRespawn += dt; if (this.autoRespawn > .5){if(!this.walker.fallen)this.run.falls++;this.respawn();} } else this.autoRespawn = 0;
+    if (b.y < -20 || Math.hypot(b.x,b.z+18)>48 ||this.submergedTime>3) { this.autoRespawn += dt; if (this.autoRespawn > .5){if(!this.walker.fallen)this.run.falls++;this.respawn();} } else this.autoRespawn = 0;
     this.saveTime += dt; if (this.saveTime > 5) { this.saveTime = 0; this.save(); }
   }
   private frame = (now: number) => {
     const dt = Math.min((now - this.last) / 1000, .08); this.last = now;
-    const wasRunning=['playing','fallen','recovering'].includes(this.run.phase);
+    const wasRunning=['playing','fallen','recovering','sliding'].includes(this.run.phase);
     this.pollGamepad();
-    if (['playing', 'fallen', 'recovering'].includes(this.run.phase)) {
+    if (['playing', 'fallen', 'recovering','sliding'].includes(this.run.phase)) {
       this.accumulator += wasRunning?dt:0;
       let count = 0;
       while (this.accumulator >= PHYSICS_DT && count++ < 10) { this.accumulator -= PHYSICS_DT; this.fixed(PHYSICS_DT); if ((this.run.phase as string) === 'finished') { this.accumulator = 0; break; } }
