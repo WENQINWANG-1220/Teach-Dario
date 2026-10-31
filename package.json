@@ -9,6 +9,14 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "test:browser": "node tests/browser.mjs",
+    "test:developer": "node tests/developer-browser.mjs",
+    "test:daniela": "node tests/daniela-browser.mjs",
+    "test:sam": "node tests/sam-browser.mjs",
+    "test:reward": "node tests/reward-browser.mjs",
+    "test:ending": "node tests/ending-browser.mjs",
+    "test:summit": "node tests/summit-browser.mjs",
+    "test:cinematic": "node tests/cinematic-browser.mjs",
+    "test:media": "node tests/media-server.mjs",
     "test:gamepad": "node tests/gamepad-browser.mjs",
     "test:route:browser": "node tests/full-route-browser.mjs",
     "test:production": "node tests/production.mjs",
@@ -19,7 +27,8 @@
     "export:glb": "node tools/export-glb.mjs",
     "assets:generate": "node tools/export-glb.mjs --out public/models --runtime-only",
     "start": "node tools/serve.mjs",
-    "test:scene": "node tests/scene-browser.mjs"
+    "test:scene": "node tests/scene-browser.mjs",
+    "test:map-walk": "node tests/map-walk-browser.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",

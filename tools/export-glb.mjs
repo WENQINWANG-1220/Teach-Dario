@@ -24,7 +24,10 @@ try{
     const bytes=Buffer.from(data,'base64');if(bytes.readUInt32LE(0)!==0x46546c67||bytes.readUInt32LE(4)!==2||bytes.readUInt32LE(8)!==bytes.length)throw Error(`Invalid GLB header: ${file}`);
     const json=JSON.parse(bytes.subarray(20,20+bytes.readUInt32LE(12)).toString('utf8').trim());
     if(json.buffers?.some(b=>b.uri)||json.images?.some(i=>i.uri))throw Error(`External dependency in ${file}`);
-    await writeFile(resolve(output,file),bytes);console.log(`${file}  ${(report.bytes/1024).toFixed(1)} KB  ${report.meshes} meshes`);
+    const destination=resolve(output,file);
+    let same=false;try{same=(await readFile(destination)).equals(bytes);}catch(error){if(error.code!=='ENOENT')throw error;}
+    if(!same)await writeFile(destination,bytes);
+    console.log(`${file}  ${(report.bytes/1024).toFixed(1)} KB  ${report.meshes} meshes${same?' (unchanged)':''}`);
   });
   await page.goto(`${origin}/tools/export.html`);await page.waitForFunction(()=>typeof window.exportAll==='function');
   const manifest=await page.evaluate(runtimeOnly=>window.exportAll(runtimeOnly),runtimeOnly);

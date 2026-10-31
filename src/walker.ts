@@ -16,7 +16,7 @@ export class Walker {
   private patches={} as Record<FootId,R.SphericalImpulseJoint>;
   readonly rig:PhysicalRig;readonly contacts:Contacts;readonly body:R.RigidBody;readonly feet:Record<FootId,Foot>;readonly lean=new LeanControl();readonly recovery:Recovery;
   fallen=false;unstable=0;fallTime=0;balance=1;landing:Landing='valid';facing=0;panic=0;motionTime=0;
-  private carefulStep=false;private logStep=false;private downContact=0;private footfalls:Footfall[]=[];
+  private carefulStep=false;private logStep=false;private downContact=0;private footfalls:Footfall[]=[];private turnTarget:number|null=null;
   get previous(){return this.rig.parts.Pelvis.previous;}get rendered(){return this.rig.parts.Pelvis.rendered;}get previousRotation(){return this.rig.parts.Pelvis.previousQ;}get renderedRotation(){return this.rig.parts.Pelvis.renderedQ;}
   constructor(readonly physics:R.World){
     this.rig=new PhysicalRig(physics);this.body=this.rig.parts.Pelvis.body;this.contacts=new Contacts(this.rig);
@@ -30,7 +30,7 @@ export class Walker {
     const hit=this.physics.castRayAndGetNormal(new R.Ray({x,y:top,z},{x:0,y:-1,z:0}),depth,true,undefined,GROUP.person,undefined,undefined,c=>!c.isSensor()&&!own.has(c.parent()?.handle??-1));
     return hit&&hit.normal.y>.3?{x,y:top-hit.timeOfImpact,z,normal:hit.normal,collider:hit.collider}:null;
   }
-  reset(p:Point,facing=0){this.recovery.clear();this.lean.clear();this.rig.reset(p,facing);this.fallen=false;this.downContact=this.unstable=this.fallTime=this.panic=this.motionTime=0;this.balance=1;this.facing=facing;this.footfalls=[];
+  reset(p:Point,facing=0){this.recovery.clear();this.lean.clear();this.rig.reset(p,facing);this.fallen=false;this.downContact=this.unstable=this.fallTime=this.panic=this.motionTime=0;this.balance=1;this.facing=facing;this.turnTarget=null;this.footfalls=[];
     for(const f of Object.values(this.feet)){f.pos.copy(f.body.translation());f.pos.y-=FOOT_HEIGHT;f.target.copy(f.pos);f.origin.copy(f.pos);f.stance.copy(f.pos);f.previous.copy(f.pos);f.rendered.copy(f.pos);f.velocity.set(0,0,0);f.grounded=false;f.lifted=false;f.load=0;f.planting=null;f.swingTime=0;f.lowerTime=0;f.prepareTime=0;f.ready=false;f.landingAge=1;f.heading=0;}
     this.contacts.frame.points=[];this.contacts.frame.normalLoad=0;
   }
@@ -50,8 +50,8 @@ export class Walker {
   cancelSwing(){if(this.fallen)return;for(const id of ids)if(this.feet[id].lifted)this.land(id);}
   drainFootfalls(){const out=this.footfalls;this.footfalls=[];return out;}
   releaseFallJoints(){} // Anatomical joints persist in every state.
-  completeRecovery(){this.fallen=false;this.downContact=this.fallTime=this.panic=0;this.lean.clear();for(const f of Object.values(this.feet)){f.lifted=false;f.planting=null;f.target.copy(f.pos);f.origin.copy(f.pos);f.stance.copy(f.pos);f.stance.y=this.ground(f.pos.x,f.pos.z,f.pos.y+.2,.4)?.y??f.pos.y;}}
-  fall(_support?:T.Vector3){this.fallen=true;this.fallTime=0;this.lean.clear();for(const f of Object.values(this.feet)){f.lifted=false;f.planting=null;}}
+  completeRecovery(){this.fallen=false;this.downContact=this.fallTime=this.panic=0;this.turnTarget=null;this.lean.clear();for(const f of Object.values(this.feet)){f.lifted=false;f.planting=null;f.target.copy(f.pos);f.origin.copy(f.pos);f.stance.copy(f.pos);f.stance.y=this.ground(f.pos.x,f.pos.z,f.pos.y+.2,.4)?.y??f.pos.y;}}
+  fall(_support?:T.Vector3){this.fallen=true;this.fallTime=0;this.turnTarget=null;this.lean.clear();for(const f of Object.values(this.feet)){f.lifted=false;f.planting=null;}}
   canStand(){const speed=v().copy(this.body.linvel()).length(),angular=v().copy(this.body.angvel()).length();return this.fallen&&this.fallTime>.8&&speed<.6&&angular<1.2&&this.contacts.frame.points.some(c=>c.normal.y>.35);}
   simulate(dt=PHYSICS_DT,input:LeanAxes={x:0,z:0}){this.physics.timestep=dt;this.step(dt,input);this.physics.step(undefined,this.rig.hooks);this.postStep(dt);}
   private needsCarefulStep(){
@@ -66,6 +66,13 @@ export class Walker {
     return Math.abs(this.feet.left.stance.y-this.feet.right.stance.y)>.04||targets.some((g,i)=>(g?.y??feet[i].origin.y)>feet[i].origin.y+.04);
   }
   step(dt:number,input:LeanAxes={x:0,z:0}){
+    // Keep following a landed step instead of stopping after one small yaw correction.
+    // The shared heading drives the pelvis, torso, head and feet through their motors.
+    if(this.turnTarget!==null&&!this.fallen&&!this.recovery.active&&ids.some(id=>this.feet[id].grounded)){
+      const angle=Math.atan2(Math.sin(this.turnTarget-this.facing),Math.cos(this.turnTarget-this.facing)),turn=clamp(angle,-dt*1.5,dt*1.5);
+      this.facing=Math.atan2(Math.sin(this.facing+turn),Math.cos(this.facing+turn));
+      if(Math.abs(angle)<=dt*1.5)this.turnTarget=null;
+    }
     const priorLoads={...this.assistedFeet};this.assistedLoad=0;this.assistedFeet.left=this.assistedFeet.right=0;this.motionTime+=dt;this.carefulStep=this.needsCarefulStep();this.rig.dt=dt;this.rig.legMotorSpeed=this.carefulStep||this.recovery.active||this.fallen?1.5:2.5;this.rig.beforeStep();this.lean.update(this.fallen?{x:0,z:0}:input,dt,this.facing);
     // The balance helper transmits part of the load directly to the supporting surface.
     // Supply only that missing share of Coulomb friction at the real shoe contact.
@@ -128,7 +135,7 @@ export class Walker {
     for(const id of ids){const f=this.feet[id],was=f.grounded,contacts=this.contacts.forPart(partId(id,'Shoe'));f.pos.copy(f.body.translation());f.pos.y-=FOOT_HEIGHT;f.velocity.copy(f.body.linvel());f.grounded=contacts.length>0;f.load=clamp(contacts.reduce((s,c)=>s+c.force*c.normal.y,0)/(80*9.81/2),0,1);if(contacts.length)f.normal.copy(contacts[0].normal);
       f.load=clamp(f.load+this.assistedFeet[id]/(RIG.mass*9.81/2),0,1);
       if(f.grounded&&!f.lifted&&!f.planting){const velocity=contacts[0]?.velocity;if(velocity)f.stance.addScaledVector(velocity,dt);}
-      if(f.grounded&&!f.lifted&&f.planting&&f.lowerTime>=(this.carefulStep?CAREFUL_SWING.lowerSeconds:SWING.lowerSeconds)*.8&&!this.fallen&&!this.recovery.active&&(Math.hypot(f.pos.x-f.target.x,f.pos.z-f.target.z)<.08||f.prepareTime>2)){const moved=Math.hypot(f.target.x-f.origin.x,f.target.z-f.origin.z)>.05&&Math.hypot(f.pos.x-f.origin.x,f.pos.z-f.origin.z)>.05;if(moved){this.footfalls.push({id,position:{...f.pos},speed:Math.abs(f.velocity.y),moved});let angle=Math.atan2(f.origin.x-f.target.x,f.origin.z-f.target.z)-this.facing;angle=Math.atan2(Math.sin(angle),Math.cos(angle));if(Math.abs(angle)>Math.PI/2)angle-=Math.sign(angle)*Math.PI;this.facing+=clamp(angle,-.5,.5)*.25;this.facing=Math.atan2(Math.sin(this.facing),Math.cos(this.facing));}f.stance.copy(f.pos);f.stance.y=contacts[0]?.point.y??f.pos.y;f.planting=null;f.landingAge=0;}
+      if(f.grounded&&!f.lifted&&f.planting&&f.lowerTime>=(this.carefulStep?CAREFUL_SWING.lowerSeconds:SWING.lowerSeconds)*.8&&!this.fallen&&!this.recovery.active&&(Math.hypot(f.pos.x-f.target.x,f.pos.z-f.target.z)<.08||f.prepareTime>2)){const moved=Math.hypot(f.target.x-f.origin.x,f.target.z-f.origin.z)>.05&&Math.hypot(f.pos.x-f.origin.x,f.pos.z-f.origin.z)>.05;if(moved){this.footfalls.push({id,position:{...f.pos},speed:Math.abs(f.velocity.y),moved});let angle=Math.atan2(f.origin.x-f.target.x,f.origin.z-f.target.z)-this.facing;angle=Math.atan2(Math.sin(angle),Math.cos(angle));if(Math.abs(angle)>Math.PI/2)angle-=Math.sign(angle)*Math.PI;this.turnTarget=this.facing+angle;}f.stance.copy(f.pos);f.stance.y=contacts[0]?.point.y??f.pos.y;f.planting=null;f.landingAge=0;}
     }
     const down=this.contacts.frame.points.some(c=>['Torso','Head','Pelvis'].includes(c.part)&&c.normal.y>.35&&c.force>20);
     if(!this.recovery.active&&!this.fallen){this.downContact=down?this.downContact+dt:0;if(this.downContact>.12)this.fall();}

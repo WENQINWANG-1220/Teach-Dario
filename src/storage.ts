@@ -1,6 +1,6 @@
 import { CHECKPOINTS, MAP_ID, type RunState } from './model';
 export const SAVE_KEY = 'baby-steps:save:poop-mountain:v1';
-export interface Save { version: 1; map: string; checkpoint: number; checkpointMeters: number; elapsed: number; falls: number; steps: number; maxProgress: number; best: number | null; muted: boolean; finished: boolean }
+export interface Save { version: 1; map: string; checkpoint: number; checkpointMeters: number; elapsed: number; falls: number; steps: number; maxProgress: number; best: number | null; muted: boolean; finished: boolean; danielaSeen?:boolean;samSeen?:boolean;walkingUnlocked?:boolean;rewardSeen?:boolean;endingIndex?:number;summitRevealed?:boolean }
 export function parseSave(raw: string | null): Save | null {
   if (!raw) return null;
   try {
@@ -8,6 +8,13 @@ export function parseSave(raw: string | null): Save | null {
     const distances = CHECKPOINTS;
     if (s.version !== 1 || s.map !== MAP_ID || !Number.isInteger(s.checkpoint) || s.checkpoint < 0 || s.checkpoint >= distances.length || !['elapsed', 'falls', 'steps', 'maxProgress'].every(k => Number.isFinite(s[k]) && s[k] >= 0) || s.maxProgress > 180 || !Number.isInteger(s.falls) || !Number.isInteger(s.steps) || !(s.best === null || Number.isFinite(s.best) && s.best > 0) || typeof s.muted !== 'boolean' || typeof s.finished !== 'boolean') return null;
     if(s.checkpointMeters!==undefined&&!CHECKPOINTS.includes(s.checkpointMeters))return null;
+    if(s.danielaSeen!==undefined&&typeof s.danielaSeen!=='boolean')return null;
+    if(s.samSeen!==undefined&&typeof s.samSeen!=='boolean')return null;
+    if(s.walkingUnlocked!==undefined&&typeof s.walkingUnlocked!=='boolean')return null;
+    if(s.rewardSeen!==undefined&&typeof s.rewardSeen!=='boolean')return null;
+    if(s.endingIndex!==undefined&&(!Number.isInteger(s.endingIndex)||s.endingIndex<0||s.endingIndex>12))return null;
+    if(s.summitRevealed!==undefined&&typeof s.summitRevealed!=='boolean')return null;
+    if(s.rewardSeen&&!s.walkingUnlocked)return null;
     const meters = s.checkpointMeters;
     if(!CHECKPOINTS.includes(meters)||CHECKPOINTS[s.checkpoint]!==meters)return null;
     return {...s,checkpoint:CHECKPOINTS.indexOf(meters),checkpointMeters:meters};
@@ -17,10 +24,10 @@ export class SaveStore {
   available = true; saved: Save | null = null; muted = false;
   constructor() { try { this.saved = parseSave(localStorage.getItem(SAVE_KEY)); const muted = localStorage.getItem('baby-steps:muted:v1'); this.muted = muted === null ? this.saved?.muted ?? false : muted === 'true'; } catch { this.available = false; } }
   setMuted(muted: boolean) { this.muted = muted; try { localStorage.setItem('baby-steps:muted:v1', String(muted)); } catch { this.available = false; } }
-  write(run: RunState, muted: boolean) {
+  write(run: RunState, muted: boolean,danielaSeen=false,samSeen=false,rewardSeen=false,endingIndex=0,summitRevealed=false) {
     this.setMuted(muted);
     const best = run.phase === 'finished' ? Math.min(this.saved?.best ?? Infinity, run.elapsed) : this.saved?.best ?? null;
-    this.saved = { version: 1, map:MAP_ID, checkpoint: run.checkpoint, checkpointMeters:CHECKPOINTS[run.checkpoint], elapsed: run.elapsed, falls: run.falls, steps: run.steps, maxProgress: run.maxProgress, best, muted, finished: run.phase === 'finished' };
+    this.saved = { version: 1, map:MAP_ID, checkpoint: run.checkpoint, checkpointMeters:CHECKPOINTS[run.checkpoint], elapsed: run.elapsed, falls: run.falls, steps: run.steps, maxProgress: run.maxProgress, best, muted, finished: run.phase === 'finished',danielaSeen,samSeen,walkingUnlocked:run.walkingUnlocked,rewardSeen:run.walkingUnlocked&&rewardSeen,endingIndex,summitRevealed };
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(this.saved)); } catch { this.available = false; }
   }
 }

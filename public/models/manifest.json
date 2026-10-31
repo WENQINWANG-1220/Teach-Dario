@@ -2,53 +2,123 @@
   "format": "glTF 2.0 binary",
   "units": "meters",
   "upAxis": "Y",
-  "generatedAt": "2026-10-31T04:22:40.678Z",
-  "source": "src/art/builders.ts + src/art/layout.ts + src/terrain.ts",
-  "animations": "Rig v2 named sibling driver nodes; dynamic physical bones and interpolation remain in TypeScript",
+  "generatedAt": "2026-10-31T07:04:24.063Z",
+  "source": "src/art/builders.ts + src/art/layout.ts + src/terrain.ts; imported character GLBs preserved",
+  "animations": "Dario Mixamo skin driven by 15 dynamic physical bodies; gameplay remains in TypeScript",
   "assets": [
     {
       "id": "hiker",
-      "file": "hiker.glb",
+      "file": "Dariov2.glb",
       "kind": "hiker",
       "requiredNodes": [
-        "Pelvis",
-        "Head",
-        "Hand_L",
-        "Hand_R",
-        "Torso",
-        "Shoulder_L",
-        "Elbow_L",
-        "Shoulder_R",
-        "Elbow_R",
-        "Leg_L",
-        "Thigh_L",
-        "Shin_L",
-        "Shoe_L",
-        "Leg_R",
-        "Thigh_R",
-        "Shin_R",
-        "Shoe_R"
+        "mixamorigHips",
+        "mixamorigSpine",
+        "mixamorigHead",
+        "mixamorigLeftArm",
+        "mixamorigLeftForeArm",
+        "mixamorigLeftHand",
+        "mixamorigRightArm",
+        "mixamorigRightForeArm",
+        "mixamorigRightHand",
+        "mixamorigLeftUpLeg",
+        "mixamorigLeftLeg",
+        "mixamorigLeftFoot",
+        "mixamorigRightUpLeg",
+        "mixamorigRightLeg",
+        "mixamorigRightFoot",
+        "mixamorigSpine1",
+        "mixamorigSpine2",
+        "mixamorigNeck",
+        "mixamorigHeadTop_End",
+        "mixamorigLeftShoulder",
+        "mixamorigRightShoulder"
       ],
       "axis": "Y up; local XYZ",
       "origin": "局部原点位于地面双脚中间；驱动节点坐标见编辑说明",
       "purpose": "15 刚体物理姿态驱动的玩家角色（骨架第 2 版）",
       "dimensions": [
-        0.5999999994039535,
-        1.8270000058412552,
-        0.5677398376750986
+        0.42651330313284314,
+        0.977417971866284,
+        0.2123109810013873
       ],
-      "bytes": 122312,
-      "meshes": 24,
+      "bytes": 12042428,
+      "meshes": 1,
       "bounds": {
         "min": [
-          -0.29999999970197677,
-          -1.7881393449270533e-9,
-          -0.21773983901620309
+          -0.21325657499432557,
+          -7.595116108969299e-7,
+          -0.10615544536396204
         ],
         "max": [
-          0.29999999970197677,
-          1.8270000040531158,
-          0.3499999986588955
+          0.21325672813851757,
+          0.977417212354673,
+          0.10615553563742525
+        ]
+      }
+    },
+    {
+      "id": "daniela",
+      "file": "Dario_sister.glb",
+      "kind": "npc",
+      "requiredNodes": [
+        "Hip",
+        "Head",
+        "BoneRoot"
+      ],
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "Daniela 半透明记忆投影",
+      "dimensions": [
+        0.34637474726559275,
+        0.9779047179198158,
+        0.18180862869934578
+      ],
+      "bytes": 9782916,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.17318775708226053,
+          1.866450497136056e-7,
+          -0.09090433214647627
+        ],
+        "max": [
+          0.17318699018333222,
+          0.9779049045648656,
+          0.09090429655286951
+        ]
+      }
+    },
+    {
+      "id": "sam",
+      "file": "SAM.glb",
+      "kind": "npc",
+      "requiredNodes": [
+        "Armature",
+        "mixamorigHips",
+        "mixamorigHead",
+        "mixamorigLeftUpLeg",
+        "mixamorigRightUpLeg"
+      ],
+      "axis": "Y up; local XYZ",
+      "origin": "原始人物局部脚底中心；运行时规范为约 1.8 米高",
+      "purpose": "Sam Altman 桥头与奖励存档点对话角色，保留用户原始模型",
+      "dimensions": [
+        0.3425140380859375,
+        0.9778443487739423,
+        0.1970977634191513
+      ],
+      "bytes": 8439128,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.1712493598461151,
+          -2.2970198187977076e-7,
+          -0.09854887425899506
+        ],
+        "max": [
+          0.1712646782398224,
+          0.9778441190719604,
+          0.09854888916015625
         ]
       }
     },
@@ -67,15 +137,15 @@
       "dimensions": [
         29.600000381469727,
         21.254702329635624,
-        29.600000381469727
+        29.317761421203613
       ],
-      "bytes": 474440,
-      "meshes": 6,
+      "bytes": 1104876,
+      "meshes": 16,
       "bounds": {
         "min": [
           -14.800000190734863,
           -0.2047259807586701,
-          -14.800000190734863
+          -14.51776123046875
         ],
         "max": [
           14.800000190734863,
@@ -85,10 +155,10 @@
       }
     },
     {
-      "id": "terrain-base-b4bb83",
-      "file": "terrain-base-b4bb83.glb",
+      "id": "terrain-base-a49b68",
+      "file": "terrain-base-a49b68.glb",
       "kind": "base",
-      "color": "#b4bb83",
+      "color": "#a49b68",
       "size": {
         "x": 1,
         "y": 1,
@@ -118,10 +188,10 @@
       }
     },
     {
-      "id": "terrain-path-d9bb89",
-      "file": "terrain-path-d9bb89.glb",
-      "kind": "box",
-      "color": "#d9bb89",
+      "id": "terrain-path-b88b5e",
+      "file": "terrain-path-b88b5e.glb",
+      "kind": "dirt",
+      "color": "#b88b5e",
       "size": {
         "x": 1,
         "y": 1,
@@ -129,13 +199,13 @@
       },
       "axis": "Y up; local XYZ",
       "origin": "局部原点位于主体中心",
-      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "purpose": "起伏山路与夯土休息平台",
       "dimensions": [
         1,
-        1,
+        1.0009999871253967,
         1
       ],
-      "bytes": 2260,
+      "bytes": 60356,
       "meshes": 1,
       "bounds": {
         "min": [
@@ -145,16 +215,16 @@
         ],
         "max": [
           0.5,
-          0.5,
+          0.5009999871253967,
           0.5
         ]
       }
     },
     {
-      "id": "terrain-path-dbc58f",
-      "file": "terrain-path-dbc58f.glb",
-      "kind": "box",
-      "color": "#dbc58f",
+      "id": "terrain-path-a97950",
+      "file": "terrain-path-a97950.glb",
+      "kind": "dirt",
+      "color": "#a97950",
       "size": {
         "x": 1,
         "y": 1,
@@ -162,13 +232,13 @@
       },
       "axis": "Y up; local XYZ",
       "origin": "局部原点位于主体中心",
-      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "purpose": "起伏山路与夯土休息平台",
       "dimensions": [
         1,
-        1,
+        1.0009999871253967,
         1
       ],
-      "bytes": 2260,
+      "bytes": 60356,
       "meshes": 1,
       "bounds": {
         "min": [
@@ -178,7 +248,7 @@
         ],
         "max": [
           0.5,
-          0.5,
+          0.5009999871253967,
           0.5
         ]
       }
@@ -250,10 +320,10 @@
       }
     },
     {
-      "id": "terrain-rest-e1cda4",
-      "file": "terrain-rest-e1cda4.glb",
-      "kind": "box",
-      "color": "#e1cda4",
+      "id": "terrain-rest-c99e6d",
+      "file": "terrain-rest-c99e6d.glb",
+      "kind": "dirt",
+      "color": "#c99e6d",
       "size": {
         "x": 1,
         "y": 1,
@@ -261,13 +331,13 @@
       },
       "axis": "Y up; local XYZ",
       "origin": "局部原点位于主体中心",
-      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "purpose": "起伏山路与夯土休息平台",
       "dimensions": [
         1,
-        1,
+        1.0009999871253967,
         1
       ],
-      "bytes": 2260,
+      "bytes": 60356,
       "meshes": 1,
       "bounds": {
         "min": [
@@ -277,16 +347,16 @@
         ],
         "max": [
           0.5,
-          0.5,
+          0.5009999871253967,
           0.5
         ]
       }
     },
     {
-      "id": "terrain-slide-c98543",
-      "file": "terrain-slide-c98543.glb",
-      "kind": "box",
-      "color": "#c98543",
+      "id": "terrain-slide-9d653c",
+      "file": "terrain-slide-9d653c.glb",
+      "kind": "mud",
+      "color": "#9d653c",
       "size": {
         "x": 1,
         "y": 1,
@@ -294,13 +364,13 @@
       },
       "axis": "Y up; local XYZ",
       "origin": "局部原点位于主体中心",
-      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "purpose": "贴山弯曲泥土滑道",
       "dimensions": [
         1,
-        1,
+        1.0009999871253967,
         1
       ],
-      "bytes": 2264,
+      "bytes": 60356,
       "meshes": 1,
       "bounds": {
         "min": [
@@ -310,16 +380,16 @@
         ],
         "max": [
           0.5,
-          0.5,
+          0.5009999871253967,
           0.5
         ]
       }
     },
     {
-      "id": "terrain-rail-92552f",
-      "file": "terrain-rail-92552f.glb",
-      "kind": "box",
-      "color": "#92552f",
+      "id": "terrain-rail-70452c",
+      "file": "terrain-rail-70452c.glb",
+      "kind": "clay-bank",
+      "color": "#70452c",
       "size": {
         "x": 1,
         "y": 1,
@@ -327,13 +397,13 @@
       },
       "axis": "Y up; local XYZ",
       "origin": "局部原点位于主体中心",
-      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "purpose": "泥土滑沟挡边",
       "dimensions": [
         1,
         1,
         1
       ],
-      "bytes": 2264,
+      "bytes": 11084,
       "meshes": 1,
       "bounds": {
         "min": [
@@ -351,7 +421,7 @@
     {
       "id": "terrain-rest-e6d1a4",
       "file": "terrain-rest-e6d1a4.glb",
-      "kind": "box",
+      "kind": "dirt",
       "color": "#e6d1a4",
       "size": {
         "x": 1,
@@ -360,13 +430,13 @@
       },
       "axis": "Y up; local XYZ",
       "origin": "局部原点位于主体中心",
-      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "purpose": "起伏山路与夯土休息平台",
       "dimensions": [
         1,
-        1,
+        1.0009999871253967,
         1
       ],
-      "bytes": 2260,
+      "bytes": 60356,
       "meshes": 1,
       "bounds": {
         "min": [
@@ -376,7 +446,7 @@
         ],
         "max": [
           0.5,
-          0.5,
+          0.5009999871253967,
           0.5
         ]
       }
@@ -424,22 +494,22 @@
       "origin": "局部原点位于根部／立柱底部",
       "purpose": "运行时文字路牌",
       "dimensions": [
-        2.0999999046325684,
-        1.4799999803304673,
-        0.12663118913769722
+        2.5,
+        1.7350000001490116,
+        0.18000000715255737
       ],
-      "bytes": 5240,
-      "meshes": 2,
+      "bytes": 9752,
+      "meshes": 4,
       "bounds": {
         "min": [
-          -1.0499999523162842,
-          -0.04999997615814211,
-          -0.056631188839673996
+          -1.25,
+          0,
+          -0.09000000357627869
         ],
         "max": [
-          1.0499999523162842,
-          1.430000004172325,
-          0.07000000029802322
+          1.25,
+          1.7350000001490116,
+          0.09000000357627869
         ]
       }
     },
@@ -447,7 +517,7 @@
       "id": "flag",
       "file": "flag.glb",
       "kind": "flag",
-      "color": "#d77640",
+      "color": "#d9794f",
       "requiredNodes": [
         "Flag_Cloth"
       ],
@@ -459,7 +529,7 @@
         2.0999999046325684,
         0.09000000357627869
       ],
-      "bytes": 5728,
+      "bytes": 5732,
       "meshes": 2,
       "bounds": {
         "min": [
@@ -502,6 +572,117 @@
           0.6999999940395355,
           2.099999952316284,
           0.04500000178813934
+        ]
+      }
+    },
+    {
+      "id": "alignment-outpost",
+      "file": "alignment-outpost.glb",
+      "kind": "outpost",
+      "requiredNodes": [
+        "Sign_Board"
+      ],
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "登山研究所入口",
+      "dimensions": [
+        4.801499956241352,
+        4.696350011801719,
+        0.800000011920929
+      ],
+      "bytes": 47332,
+      "meshes": 21,
+      "bounds": {
+        "min": [
+          -2.400749978120676,
+          -2.980232227667301e-9,
+          -0.4000000059604645
+        ],
+        "max": [
+          2.400749978120676,
+          4.696350008821487,
+          0.4000000059604645
+        ]
+      }
+    },
+    {
+      "id": "claude-asterisk",
+      "file": "claude-asterisk.glb",
+      "kind": "asterisk",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "Claude 星芒彩蛋",
+      "dimensions": [
+        1.399999976158142,
+        2.2368499998807905,
+        1.399999976158142
+      ],
+      "bytes": 33264,
+      "meshes": 15,
+      "bounds": {
+        "min": [
+          -0.699999988079071,
+          -5.9604643443123e-10,
+          -0.699999988079071
+        ],
+        "max": [
+          0.699999988079071,
+          2.236849999284744,
+          0.699999988079071
+        ]
+      }
+    },
+    {
+      "id": "plunger-shrine",
+      "file": "plunger-shrine.glb",
+      "kind": "plunger",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "皮搋子纪念碑",
+      "dimensions": [
+        1.5216903686523438,
+        2.4449999931454656,
+        1.600000023841858
+      ],
+      "bytes": 50440,
+      "meshes": 6,
+      "bounds": {
+        "min": [
+          -0.7608451843261719,
+          3.5762786898541066e-9,
+          -0.800000011920929
+        ],
+        "max": [
+          0.7608451843261719,
+          2.4449999967217444,
+          0.800000011920929
+        ]
+      }
+    },
+    {
+      "id": "context-paper",
+      "file": "context-paper.glb",
+      "kind": "paper",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "厕纸补给站",
+      "dimensions": [
+        1.2327760495310303,
+        1.330000008046627,
+        1.0099999988079071
+      ],
+      "bytes": 83708,
+      "meshes": 14,
+      "bounds": {
+        "min": [
+          -0.6000000238418579,
+          2.682209010451686e-9,
+          -0.44999998807907104
+        ],
+        "max": [
+          0.6327760256891724,
+          1.3300000107288361,
+          0.5600000107288361
         ]
       }
     },

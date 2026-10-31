@@ -9,6 +9,14 @@ function changeJSON(bytes,change){const length=bytes.readUInt32LE(12),json=JSON.
 try{
   const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[],requests=[];
   page.on('pageerror',e=>errors.push(String(e)));page.on('request',r=>requests.push(r.url()));await page.goto(origin);await loaded(page);
+  const skin=await page.evaluate(()=>{
+    const a=g.assets.instantiate('hiker'),b=g.assets.instantiate('hiker');
+    const first=a.getObjectByProperty('isSkinnedMesh',true),second=b.getObjectByProperty('isSkinnedMesh',true);
+    const live=g.world.scene.getObjectByProperty('isSkinnedMesh',true);
+    live.skeleton.update();
+    return {independent:first.skeleton.bones[0]!==second.skeleton.bones[0],bones:live.skeleton.bones.length,finite:Array.from(live.skeleton.boneMatrices).every(Number.isFinite)};
+  });
+  assert.equal(skin.independent,true);assert.ok(skin.bones>=65);assert.equal(skin.finite,true);
   const count=requests.filter(u=>u.endsWith('.glb')).length,expected=await page.evaluate(async()=>(await import('/src/art/layout.ts')).ART_DEFINITIONS.length);
   assert.equal(count,expected);assert.equal(requests.some(u=>u.includes('/src/art/builders')),false);
   const sharing=await page.evaluate(()=>{const a=g.assets.instantiate('tree'),b=g.assets.instantiate('tree'),meshes=[];a.traverse(n=>{if(n.isMesh)meshes.push(n);});const other=[];b.traverse(n=>{if(n.isMesh)other.push(n);});return {geometry:meshes[0].geometry===other[0].geometry,material:meshes[0].material===other[0].material,node:a!==b};});assert.deepEqual(sharing,{geometry:true,material:true,node:true});
@@ -20,13 +28,13 @@ try{
   });assert.equal(collision.allGLB,true);assert.equal(collision.beforeWall,true);assert.ok(collision.distance<1);
   await page.screenshot({path:'.runtime/glb-home.png'});await page.click('#start');await page.waitForFunction(()=>g.run.phase==='playing');await page.keyboard.press('Escape');await page.locator('#back').click();await page.click('#start');await page.waitForFunction(()=>g.run.phase==='playing');
   assert.equal(requests.filter(u=>u.endsWith('.glb')).length,count);assert.equal(await page.locator('#scene canvas').count(),1);
-  const childX=await page.evaluate(()=>{const mesh=g.character.torso.getObjectByProperty('isMesh',true);mesh.position.x+=.125;return mesh.position.x;});await page.waitForTimeout(150);
-  assert.equal(await page.evaluate(()=>g.character.torso.getObjectByProperty('isMesh',true).position.x),childX);assert.deepEqual(errors,[]);await page.close();
-  const missing=await browser.newPage();await missing.route('**/models/hiker.glb',r=>r.fulfill({status:404,body:'missing'}));await missing.goto(origin);await missing.locator('#asset-error').waitFor();assert.match(await missing.locator('#asset-error').textContent(),/hiker\.glb/);assert.equal(await missing.locator('#scene canvas').count(),0);
-  await missing.unroute('**/models/hiker.glb');await missing.click('#retry-assets');await loaded(missing);await missing.close();
-  const bytes=await readFile(new URL('../public/models/hiker.glb',import.meta.url)),broken=changeJSON(bytes,j=>{j.nodes.find(n=>n.name==='Torso').name='Missing_Torso';});
-  const invalid=await browser.newPage();await invalid.route('**/models/hiker.glb',r=>r.fulfill({status:200,contentType:'model/gltf-binary',body:broken}));await invalid.goto(origin);await invalid.locator('#asset-error').waitFor();assert.match(await invalid.locator('#asset-error').textContent(),/hiker\.glb.*Torso/);await invalid.close();
-  const edited=changeJSON(bytes,j=>{const torso=j.nodes.find(n=>n.name==='Torso'),mesh=j.nodes[torso.children.find(i=>j.nodes[i].mesh!==undefined)].mesh,index=j.meshes[mesh].primitives[0].material;j.materials[index].pbrMetallicRoughness.baseColorFactor=[.1,.2,.9,1];});const replacement=await browser.newPage();await replacement.route('**/models/hiker.glb',r=>r.fulfill({status:200,contentType:'model/gltf-binary',body:edited}));await replacement.goto(origin);await loaded(replacement);
-  assert.ok(await replacement.evaluate(()=>{const mesh=g.character.torso.getObjectByProperty('isMesh',true);return mesh.material.color.b>mesh.material.color.r*3;}));await replacement.close();
+  const childX=await page.evaluate(()=>{const mesh=g.world.scene.getObjectByProperty('isSkinnedMesh',true);mesh.position.x+=.125;return mesh.position.x;});await page.waitForTimeout(150);
+  assert.equal(await page.evaluate(()=>g.world.scene.getObjectByProperty('isSkinnedMesh',true).position.x),childX);assert.deepEqual(errors,[]);await page.close();
+  const missing=await browser.newPage();await missing.route('**/models/Dariov2.glb',r=>r.fulfill({status:404,body:'missing'}));await missing.goto(origin);await missing.locator('#asset-error').waitFor();assert.match(await missing.locator('#asset-error').textContent(),/Dariov2\.glb/);assert.equal(await missing.locator('#scene canvas').count(),0);
+  await missing.unroute('**/models/Dariov2.glb');await missing.click('#retry-assets');await loaded(missing);await missing.close();
+  const bytes=await readFile(new URL('../public/models/Dariov2.glb',import.meta.url)),broken=changeJSON(bytes,j=>{j.nodes.find(n=>n.name==='mixamorig:Spine').name='Missing_Spine';});
+  const invalid=await browser.newPage();await invalid.route('**/models/Dariov2.glb',r=>r.fulfill({status:200,contentType:'model/gltf-binary',body:broken}));await invalid.goto(origin);await invalid.locator('#asset-error').waitFor();assert.match(await invalid.locator('#asset-error').textContent(),/Dariov2\.glb.*Spine/);await invalid.close();
+  const edited=changeJSON(bytes,j=>{const mesh=j.nodes.find(n=>n.skin!==undefined&&n.mesh!==undefined).mesh,index=j.meshes[mesh].primitives[0].material;j.materials[index].pbrMetallicRoughness.baseColorFactor=[.1,.2,.9,1];});const replacement=await browser.newPage();await replacement.route('**/models/Dariov2.glb',r=>r.fulfill({status:200,contentType:'model/gltf-binary',body:edited}));await replacement.goto(origin);await loaded(replacement);
+  assert.ok(await replacement.evaluate(()=>{const mesh=g.world.scene.getObjectByProperty('isSkinnedMesh',true);return mesh.material.color.b>mesh.material.color.r*3;}));await replacement.close();
   console.log(`GLB browser passed: ${count} model requests, shared geometry/materials, no procedural builders or repeated downloads, camera collision with GLB meshes, preserved child transforms, missing file retry, missing node error and edited material preservation.`);
 }finally{await browser.close();}

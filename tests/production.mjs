@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
-import { mkdir } from 'node:fs/promises';
+import { readFile, mkdir } from 'node:fs/promises';
 await mkdir('.runtime',{recursive:true});
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-proxy-server','--enable-webgl','--use-angle=swiftshader']});
 const page=await browser.newPage({viewport:{width:1280,height:720}}),errors=[],external=[],models=new Set();
@@ -42,5 +42,5 @@ try{
   await page.evaluate(()=>{window.productionPadConnected=false;});await page.locator('#overlay').waitFor({state:'visible'});
   await page.evaluate(()=>{productionPad.buttons[9]={value:1,pressed:true,touched:true};window.productionPadConnected=true;});await page.waitForTimeout(150);assert.equal(await page.locator('#overlay').isVisible(),true);
   await padButton(9,0);await padButton(9,1);await padButton(9,0);await page.locator('#overlay').waitFor({state:'hidden'});assert.equal(await page.evaluate(()=>document.pointerLockElement),null);await page.screenshot({path:'.runtime/production-gamepad.png'});
-  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);assert.equal(models.size,17);console.log('Production passed: local GLBs/WASM, keyboard and mouse regression, virtual gamepad no-lock start/continue, both feet, disconnect/reconnect safety, saved settings, layouts and no external requests.');
+  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);const manifest=JSON.parse(await readFile(new URL('../public/models/manifest.json',import.meta.url),'utf8'));assert.equal(models.size,manifest.assets.length);console.log('Production passed: local GLBs/WASM, keyboard and mouse regression, virtual gamepad no-lock start/continue, both feet, disconnect/reconnect safety, saved settings, layouts and no external requests.');
 }finally{await browser.close();}
