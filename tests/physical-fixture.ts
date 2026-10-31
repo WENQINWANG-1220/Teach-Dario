@@ -1,0 +1,2 @@
+import R from '@dimforge/rapier3d-compat';import {Walker} from '../src/walker';import {GROUP,PHYSICS_DT} from '../src/rig';
+export function fixture(y=0){const world=new R.World({x:0,y:-9.81,z:0});world.createCollider(R.ColliderDesc.cuboid(15,.2,15).setTranslation(0,-.2,0).setFriction(.85).setCollisionGroups(GROUP.terrain));const w=new Walker(world);w.reset({x:0,y,z:0});const tick=(n:number,input={x:0,z:0})=>{for(let i=0;i<n;i++)w.simulate(PHYSICS_DT,input);};return {world,w,tick};}

@@ -1,0 +1,7 @@
+import {describe,it,expect} from 'vitest';import {LeanControl,MAX_LEAN_SHIFT} from '../src/lean';
+describe('anatomical lean intent',()=>{
+  it('is time-step independent',()=>{const a=new LeanControl(),b=new LeanControl();for(let i=0;i<60;i++)a.update({x:0,z:1},1/60,0);for(let i=0;i<120;i++)b.update({x:0,z:1},1/120,0);expect(a.axes.distanceTo(b.axes)).toBeLessThan(1e-9);expect(a.angles.distanceTo(b.angles)).toBeLessThan(1e-9);});
+  it('limits sustained input and normalized diagonal weight shift',()=>{const c=new LeanControl();for(let i=0;i<1000;i++)c.update({x:1,z:1},1/120,0);expect(c.axes.length()).toBeCloseTo(1);expect(c.offset.length()).toBeLessThanOrEqual(MAX_LEAN_SHIFT+1e-9);expect(c.angles.x).toBeLessThanOrEqual(25*Math.PI/180);expect(c.angles.y).toBeLessThanOrEqual(40*Math.PI/180);expect(c.tilt.length()).toBeLessThan(40*Math.PI/180);});
+  it('moves with the character heading and eases back when released',()=>{const c=new LeanControl();c.update({x:0,z:1},1,Math.PI/2);expect(c.offset.x).toBeLessThan(-.17);expect(Math.abs(c.offset.z)).toBeLessThan(1e-6);const before=c.angles.length();c.update({x:0,z:0},1/120,Math.PI/2);expect(c.angles.length()).toBeLessThan(before);expect(c.angles.length()).toBeGreaterThan(before*.9);c.update({x:0,z:0},3,0);expect(c.angles.length()).toBeLessThan(1e-6);});
+  it('clears every component on lifecycle changes',()=>{const c=new LeanControl();c.update({x:1,z:1},1,.4);c.clear();for(const vector of [c.axes,c.angles,c.tilt,c.world,c.offset])expect(vector.length()).toBe(0);});
+});

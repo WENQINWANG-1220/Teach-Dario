@@ -1,0 +1,35 @@
+{
+  "name": "baby-steps",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "test:browser": "node tests/browser.mjs",
+    "test:gamepad": "node tests/gamepad-browser.mjs",
+    "test:route:browser": "node tests/full-route-browser.mjs",
+    "test:production": "node tests/production.mjs",
+    "test:terrain": "node tests/terrain-browser.mjs",
+    "test:assets": "node tests/assets-browser.mjs",
+    "test:stumble": "node tests/stumble-browser.mjs",
+    "test:stride": "node tests/stride-browser.mjs",
+    "export:glb": "node tools/export-glb.mjs",
+    "assets:generate": "node tools/export-glb.mjs --out public/models --runtime-only",
+    "start": "node tools/serve.mjs"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/three": "^0.180.0",
+    "playwright": "^1.64.1",
+    "typescript": "~5.9.3",
+    "vite": "^6.1.0",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,996 @@
+{
+  "format": "glTF 2.0 binary",
+  "units": "meters",
+  "upAxis": "Y",
+  "generatedAt": "2026-10-30T07:40:54.413Z",
+  "source": "src/art/builders.ts + src/art/layout.ts + src/terrain.ts",
+  "animations": "Rig v2 named sibling driver nodes; dynamic physical bones and interpolation remain in TypeScript",
+  "assets": [
+    {
+      "id": "hiker",
+      "file": "hiker.glb",
+      "kind": "hiker",
+      "requiredNodes": [
+        "Pelvis",
+        "Head",
+        "Hand_L",
+        "Hand_R",
+        "Torso",
+        "Shoulder_L",
+        "Elbow_L",
+        "Shoulder_R",
+        "Elbow_R",
+        "Leg_L",
+        "Thigh_L",
+        "Shin_L",
+        "Shoe_L",
+        "Leg_R",
+        "Thigh_R",
+        "Shin_R",
+        "Shoe_R"
+      ],
+      "axis": "Rig v2; Y up, facing -Z; unit Y leg meshes, fixed driver scale Y=0.43; fifteen sibling physical drivers",
+      "origin": "局部原点位于地面双脚中间；驱动节点坐标见编辑说明",
+      "purpose": "15 刚体物理姿态驱动的玩家角色（骨架第 2 版）",
+      "dimensions": [
+        0.5999999994039535,
+        1.8270000058412552,
+        0.5677398376750986
+      ],
+      "bytes": 122312,
+      "meshes": 24,
+      "bounds": {
+        "min": [
+          -0.29999999970197677,
+          -1.7881393449270533e-9,
+          -0.21773983901620309
+        ],
+        "max": [
+          0.29999999970197677,
+          1.8270000040531158,
+          0.3499999986588955
+        ]
+      }
+    },
+    {
+      "id": "terrain-block-a1ad70",
+      "file": "terrain-block-a1ad70.glb",
+      "kind": "box",
+      "color": "#a1ad70",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2264,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-path-d6c7a1",
+      "file": "terrain-path-d6c7a1.glb",
+      "kind": "box",
+      "color": "#d6c7a1",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2264,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-support-99a46b",
+      "file": "terrain-support-99a46b.glb",
+      "kind": "box",
+      "color": "#99a46b",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2268,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-path-c4bca1",
+      "file": "terrain-path-c4bca1.glb",
+      "kind": "box",
+      "color": "#c4bca1",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2260,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-support-899477",
+      "file": "terrain-support-899477.glb",
+      "kind": "box",
+      "color": "#899477",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2264,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-ruin-step-c48a6b",
+      "file": "terrain-ruin-step-c48a6b.glb",
+      "kind": "ruin-step",
+      "color": "#c48a6b",
+      "size": {
+        "x": 1.65,
+        "y": 0.65,
+        "z": 1.15
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "错层遗迹石阶挑战",
+      "dimensions": [
+        1.666000000104308,
+        0.657499987885356,
+        1.149999976158142
+      ],
+      "bytes": 8700,
+      "meshes": 4,
+      "bounds": {
+        "min": [
+          -0.833000000052154,
+          -0.32499998807907104,
+          -0.574999988079071
+        ],
+        "max": [
+          0.833000000052154,
+          0.3324999998062849,
+          0.574999988079071
+        ]
+      }
+    },
+    {
+      "id": "terrain-ruin-step-b77b60",
+      "file": "terrain-ruin-step-b77b60.glb",
+      "kind": "ruin-step",
+      "color": "#b77b60",
+      "size": {
+        "x": 1.65,
+        "y": 0.65,
+        "z": 1.15
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "错层遗迹石阶挑战",
+      "dimensions": [
+        1.666000000104308,
+        0.657499987885356,
+        1.149999976158142
+      ],
+      "bytes": 8704,
+      "meshes": 4,
+      "bounds": {
+        "min": [
+          -0.833000000052154,
+          -0.32499998807907104,
+          -0.574999988079071
+        ],
+        "max": [
+          0.833000000052154,
+          0.3324999998062849,
+          0.574999988079071
+        ]
+      }
+    },
+    {
+      "id": "terrain-wall-c68b6b",
+      "file": "terrain-wall-c68b6b.glb",
+      "kind": "wall",
+      "color": "#c68b6b",
+      "size": {
+        "x": 0.92,
+        "y": 2.25,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "折线窄墙顶挑战",
+      "dimensions": [
+        0.9360000001043082,
+        2.257499999806285,
+        1
+      ],
+      "bytes": 29548,
+      "meshes": 14,
+      "bounds": {
+        "min": [
+          -0.4680000000521541,
+          -1.125,
+          -0.5
+        ],
+        "max": [
+          0.4680000000521541,
+          1.1324999998062848,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-wall-b97a60",
+      "file": "terrain-wall-b97a60.glb",
+      "kind": "wall",
+      "color": "#b97a60",
+      "size": {
+        "x": 0.92,
+        "y": 2.25,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "折线窄墙顶挑战",
+      "dimensions": [
+        0.9360000001043082,
+        2.257499999806285,
+        1
+      ],
+      "bytes": 29548,
+      "meshes": 14,
+      "bounds": {
+        "min": [
+          -0.4680000000521541,
+          -1.125,
+          -0.5
+        ],
+        "max": [
+          0.4680000000521541,
+          1.1324999998062848,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-log-926945-90",
+      "file": "terrain-log-926945-90.glb",
+      "kind": "log",
+      "color": "#926945",
+      "size": {
+        "x": 0.9,
+        "y": 0.9,
+        "z": 12
+      },
+      "axis": "Cylinder length along Y; size.z is length",
+      "origin": "局部原点位于主体中心",
+      "purpose": "跨谷独木桥",
+      "dimensions": [
+        0.9179999828338623,
+        12.025000000372529,
+        0.9179999828338623
+      ],
+      "bytes": 47016,
+      "meshes": 13,
+      "bounds": {
+        "min": [
+          -0.45899999141693115,
+          -6.0125000001862645,
+          -0.45899999141693115
+        ],
+        "max": [
+          0.45899999141693115,
+          6.0125000001862645,
+          0.45899999141693115
+        ]
+      }
+    },
+    {
+      "id": "terrain-log-926945-76",
+      "file": "terrain-log-926945-76.glb",
+      "kind": "log",
+      "color": "#926945",
+      "size": {
+        "x": 0.76,
+        "y": 0.76,
+        "z": 12
+      },
+      "axis": "Cylinder length along Y; size.z is length",
+      "origin": "局部原点位于主体中心",
+      "purpose": "跨谷独木桥",
+      "dimensions": [
+        0.7752000093460083,
+        12.025000000372529,
+        0.7752000093460083
+      ],
+      "bytes": 47028,
+      "meshes": 13,
+      "bounds": {
+        "min": [
+          -0.38760000467300415,
+          -6.0125000001862645,
+          -0.38760000467300415
+        ],
+        "max": [
+          0.38760000467300415,
+          6.0125000001862645,
+          0.38760000467300415
+        ]
+      }
+    },
+    {
+      "id": "terrain-rest-c4b695",
+      "file": "terrain-rest-c4b695.glb",
+      "kind": "box",
+      "color": "#c4b695",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2260,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-stone-a4a48c",
+      "file": "terrain-stone-a4a48c.glb",
+      "kind": "stone",
+      "color": "#a4a48c",
+      "size": {
+        "x": 1.25,
+        "y": 1.4,
+        "z": 1.08
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "错位踏脚石挑战",
+      "dimensions": [
+        1.3498790860176086,
+        1.7905348909161984,
+        1.2704744338989258
+      ],
+      "bytes": 9076,
+      "meshes": 3,
+      "bounds": {
+        "min": [
+          -0.6749395430088043,
+          -1.0855348908901215,
+          -0.6352372169494629
+        ],
+        "max": [
+          0.6749395430088043,
+          0.705000000026077,
+          0.6352372169494629
+        ]
+      }
+    },
+    {
+      "id": "terrain-stone-c1b99c",
+      "file": "terrain-stone-c1b99c.glb",
+      "kind": "stone",
+      "color": "#c1b99c",
+      "size": {
+        "x": 1.25,
+        "y": 1.4,
+        "z": 1.08
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "错位踏脚石挑战",
+      "dimensions": [
+        1.3498790860176086,
+        1.7905348909161984,
+        1.2704744338989258
+      ],
+      "bytes": 9076,
+      "meshes": 3,
+      "bounds": {
+        "min": [
+          -0.6749395430088043,
+          -1.0855348908901215,
+          -0.6352372169494629
+        ],
+        "max": [
+          0.6749395430088043,
+          0.705000000026077,
+          0.6352372169494629
+        ]
+      }
+    },
+    {
+      "id": "terrain-rest-c9bc9a",
+      "file": "terrain-rest-c9bc9a.glb",
+      "kind": "box",
+      "color": "#c9bc9a",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2260,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-rest-c49e7b",
+      "file": "terrain-rest-c49e7b.glb",
+      "kind": "box",
+      "color": "#c49e7b",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2260,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-block-c9bfa1",
+      "file": "terrain-block-c9bfa1.glb",
+      "kind": "box",
+      "color": "#c9bfa1",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2264,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-block-a77c65",
+      "file": "terrain-block-a77c65.glb",
+      "kind": "box",
+      "color": "#a77c65",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2264,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "terrain-block-87735a",
+      "file": "terrain-block-87735a.glb",
+      "kind": "box",
+      "color": "#87735a",
+      "size": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "axis": "Y up; origin at geometry center",
+      "origin": "局部原点位于主体中心",
+      "purpose": "按路线参数缩放的路面、平台或支撑块",
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "bytes": 2264,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.5,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "sign",
+      "file": "sign.glb",
+      "kind": "sign",
+      "requiredNodes": [
+        "Sign_Board"
+      ],
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于根部／立柱底部",
+      "purpose": "运行时文字路牌",
+      "dimensions": [
+        2.0999999046325684,
+        1.4799999803304673,
+        0.12663118913769722
+      ],
+      "bytes": 5240,
+      "meshes": 2,
+      "bounds": {
+        "min": [
+          -1.0499999523162842,
+          -0.04999997615814211,
+          -0.056631188839673996
+        ],
+        "max": [
+          1.0499999523162842,
+          1.430000004172325,
+          0.07000000029802322
+        ]
+      }
+    },
+    {
+      "id": "rock",
+      "file": "rock.glb",
+      "kind": "rock",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "环境岩石",
+      "dimensions": [
+        1.8683446645736694,
+        1.3078412652015685,
+        1.8683446645736694
+      ],
+      "bytes": 4808,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.9341723322868347,
+          -0.6539206326007843,
+          -0.9341723322868347
+        ],
+        "max": [
+          0.9341723322868347,
+          0.6539206326007843,
+          0.9341723322868347
+        ]
+      }
+    },
+    {
+      "id": "water",
+      "file": "water.glb",
+      "kind": "water",
+      "axis": "XZ plane, Y up",
+      "origin": "局部原点位于主体中心",
+      "purpose": "峡谷水面",
+      "dimensions": [
+        1,
+        2.220446049250313e-16,
+        1
+      ],
+      "bytes": 1356,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.5,
+          -1.1102230246251565e-16,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          1.1102230246251565e-16,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "hill-91a277",
+      "file": "hill-91a277.glb",
+      "kind": "hill",
+      "color": "#91a277",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "山体与远景",
+      "dimensions": [
+        1.9498558044433594,
+        1.399999976158142,
+        1.900968849658966
+      ],
+      "bytes": 2604,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.9749279022216797,
+          -0.699999988079071,
+          -0.9009688496589661
+        ],
+        "max": [
+          0.9749279022216797,
+          0.699999988079071,
+          1
+        ]
+      }
+    },
+    {
+      "id": "tree",
+      "file": "tree.glb",
+      "kind": "tree",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于根部／立柱底部",
+      "purpose": "山路树木",
+      "dimensions": [
+        1.905255913734436,
+        3.999999988079071,
+        2.200000047683716
+      ],
+      "bytes": 9736,
+      "meshes": 4,
+      "bounds": {
+        "min": [
+          -0.952627956867218,
+          -1.1920928910669204e-8,
+          -1.100000023841858
+        ],
+        "max": [
+          0.952627956867218,
+          3.999999976158142,
+          1.100000023841858
+        ]
+      }
+    },
+    {
+      "id": "hill-a5b7a0",
+      "file": "hill-a5b7a0.glb",
+      "kind": "hill",
+      "color": "#a5b7a0",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "山体与远景",
+      "dimensions": [
+        1.9498558044433594,
+        1.399999976158142,
+        1.900968849658966
+      ],
+      "bytes": 2604,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.9749279022216797,
+          -0.699999988079071,
+          -0.9009688496589661
+        ],
+        "max": [
+          0.9749279022216797,
+          0.699999988079071,
+          1
+        ]
+      }
+    },
+    {
+      "id": "hill-8caaa0",
+      "file": "hill-8caaa0.glb",
+      "kind": "hill",
+      "color": "#8caaa0",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于主体中心",
+      "purpose": "山体与远景",
+      "dimensions": [
+        1.9498558044433594,
+        1.399999976158142,
+        1.900968849658966
+      ],
+      "bytes": 2604,
+      "meshes": 1,
+      "bounds": {
+        "min": [
+          -0.9749279022216797,
+          -0.699999988079071,
+          -0.9009688496589661
+        ],
+        "max": [
+          0.9749279022216797,
+          0.699999988079071,
+          1
+        ]
+      }
+    },
+    {
+      "id": "flower-e9d392",
+      "file": "flower-e9d392.glb",
+      "kind": "flower",
+      "color": "#e9d392",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于根部／立柱底部",
+      "purpose": "起步草甸花朵",
+      "dimensions": [
+        0.15311715006828308,
+        0.4165585809946061,
+        0.15311715006828308
+      ],
+      "bytes": 5444,
+      "meshes": 2,
+      "bounds": {
+        "min": [
+          -0.07655857503414154,
+          -5.960464483090178e-9,
+          -0.07655857503414154
+        ],
+        "max": [
+          0.07655857503414154,
+          0.41655857503414156,
+          0.07655857503414154
+        ]
+      }
+    },
+    {
+      "id": "flower-f1e5c6",
+      "file": "flower-f1e5c6.glb",
+      "kind": "flower",
+      "color": "#f1e5c6",
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于根部／立柱底部",
+      "purpose": "起步草甸花朵",
+      "dimensions": [
+        0.15311715006828308,
+        0.4165585809946061,
+        0.15311715006828308
+      ],
+      "bytes": 5444,
+      "meshes": 2,
+      "bounds": {
+        "min": [
+          -0.07655857503414154,
+          -5.960464483090178e-9,
+          -0.07655857503414154
+        ],
+        "max": [
+          0.07655857503414154,
+          0.41655857503414156,
+          0.07655857503414154
+        ]
+      }
+    },
+    {
+      "id": "flag",
+      "file": "flag.glb",
+      "kind": "flag",
+      "color": "#d07650",
+      "requiredNodes": [
+        "Flag_Cloth"
+      ],
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于根部／立柱底部",
+      "purpose": "检查点与终点旗帜",
+      "dimensions": [
+        0.7389711387455463,
+        2.0999999046325684,
+        0.09000000357627869
+      ],
+      "bytes": 5728,
+      "meshes": 2,
+      "bounds": {
+        "min": [
+          -0.03897114470601082,
+          4.768371586472142e-8,
+          -0.04500000178813934
+        ],
+        "max": [
+          0.6999999940395355,
+          2.099999952316284,
+          0.04500000178813934
+        ]
+      }
+    },
+    {
+      "id": "flag-finish",
+      "file": "flag-finish.glb",
+      "kind": "flag",
+      "color": "#e3b95b",
+      "requiredNodes": [
+        "Flag_Cloth"
+      ],
+      "axis": "Y up; local XYZ",
+      "origin": "局部原点位于根部／立柱底部",
+      "purpose": "检查点与终点旗帜",
+      "dimensions": [
+        0.7389711387455463,
+        2.0999999046325684,
+        0.09000000357627869
+      ],
+      "bytes": 5740,
+      "meshes": 2,
+      "bounds": {
+        "min": [
+          -0.03897114470601082,
+          4.768371586472142e-8,
+          -0.04500000178813934
+        ],
+        "max": [
+          0.6999999940395355,
+          2.099999952316284,
+          0.04500000178813934
+        ]
+      }
+    }
+  ]
+}

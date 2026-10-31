@@ -1,0 +1,14 @@
+import {beforeAll,it,expect} from 'vitest';
+import R from '@dimforge/rapier3d-compat';
+import * as T from 'three';
+import {fixture} from './physical-fixture';
+import {swingPhases,swingClearance,SWING} from '../src/swing';
+beforeAll(async()=>{await R.init();});
+it('aims while raising and starts descent on release without a travel delay',()=>{expect(swingPhases(.08,0).travel).toBeGreaterThan(0);expect(swingPhases(.08,0).raise).toBeCloseTo(.5);expect(swingPhases(.9,0)).toEqual({raise:1,travel:1,lower:0});expect(swingPhases(.08,SWING.lowerSeconds/2).lower).toBeCloseTo(.5);});
+it('uses lower clearance on flat ground and more on long or uphill strides, with a finite cap',()=>{expect(swingClearance(0,0)).toBe(.2);expect(swingClearance(.3,0)).toBeLessThan(.3);expect(swingClearance(.3,.2)).toBeGreaterThan(swingClearance(.3,0));expect(swingClearance(100,100)).toBeLessThanOrEqual(.4);expect(swingClearance(-1,-1)).toBe(.2);});
+it('keeps the knee-first clearance phase on raised terrain',()=>{expect(swingPhases(.2,0,true).travel).toBe(0);expect(swingPhases(.2,0,true).raise).toBeGreaterThan(.5);expect(swingPhases(.9,0,true)).toEqual({raise:1,travel:1,lower:0});});
+it.each(['left','right']as const)('physically flexes the %s thigh and shoe with adaptive clearance before landing',id=>{const {world,w,tick}=fixture();tick(120);const suffix=id==='left'?'L':'R',joint=w.rig.joints.find(j=>j.definition.child===`Shin_${suffix}`)!,thigh=w.rig.parts[joint.definition.parent].body;
+  const knee=()=>joint.definition.a.clone().applyQuaternion(new T.Quaternion().copy(thigh.rotation())).add(thigh.translation()).y;
+  const startKnee=knee(),startFoot=w.feet[id].pos.y;w.lift(id);let highKnee=startKnee,highFoot=startFoot;for(let i=0;i<180;i++){tick(1);highKnee=Math.max(highKnee,knee());highFoot=Math.max(highFoot,w.feet[id].pos.y);}expect(highKnee-startKnee).toBeGreaterThan(.07);expect(highFoot-startFoot).toBeGreaterThan(.1);expect(w.fallen).toBe(false);
+  w.moveTarget(id,{x:0,z:.25},0);tick(90);w.land(id);for(let i=0;i<420&&w.feet[id].planting;i++)tick(1);expect(w.feet[id].planting).toBe(null);expect(w.fallen).toBe(false);world.free();});
+it('lets a quick click settle without forcing a full high step or teleporting',()=>{const {world,w,tick}=fixture();tick(120);const before={...w.feet.left.body.translation()};w.lift('left');w.land('left');expect(w.feet.left.body.translation()).toEqual(before);let height=0;for(let i=0;i<120;i++){tick(1);height=Math.max(height,w.feet.left.pos.y);}expect(height).toBeLessThan(.15);expect(w.feet.left.planting).toBe(null);expect(w.feet.left.body.isDynamic()).toBe(true);expect(w.fallen).toBe(false);expect(w.drainFootfalls()).toHaveLength(0);world.free();});
